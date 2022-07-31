@@ -30,7 +30,8 @@ public class LiveApi {
 	private ApiGatewayClient02FeignClient apiGatewayClient02FeignClient;
 	
 	@GetMapping("/live-check")
-    public String liveCheck(@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
+    public String liveCheck(
+    		@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
         log.info("liveCheck:: correlationId:: " + correlationId);
 		Integer port = Integer.parseInt(environment.getProperty("server.port"));
 		return String.format("Api Gateway Client 01 Server:: %s", port);
@@ -47,12 +48,21 @@ public class LiveApi {
 	
 	@GetMapping("/configuration")
 	public ProjectConfigDto configuration() throws Exception {
-		return new ProjectConfigDto(projectConfig);
+		Integer port = Integer.parseInt(environment.getProperty("server.port"));
+		var config = new ProjectConfigDto(projectConfig);
+		config.setPort(port);
+		return config;
 	}
 	
 	@GetMapping("/gateway-client-02/live-check")
-	public String gatewayClient02LiveCheck(@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
+	public String gatewayClient02LiveCheck(
+			@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
 		log.info("gatewayClient02LiveCheck:: correlationId:: " + correlationId);
 		return this.apiGatewayClient02FeignClient.liveCheck(correlationId);
+	}
+
+	@GetMapping("/gateway-client-02/configuration")
+	public ProjectConfigDto gatewayClient02Configuration()  {
+		return this.apiGatewayClient02FeignClient.getProjectConfig();
 	}
 }
