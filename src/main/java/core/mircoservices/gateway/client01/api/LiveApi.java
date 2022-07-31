@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import core.mircoservices.gateway.client01.ProjectConfig;
 import core.mircoservices.gateway.client01.dto.ProjectConfigDto;
+import core.mircoservices.gateway.client01.service.ApiGatewayClient02FeignClient;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -26,9 +26,12 @@ public class LiveApi {
 	@Autowired
 	private ProjectConfig projectConfig;
 	
+	@Autowired
+	private ApiGatewayClient02FeignClient apiGatewayClient02FeignClient;
+	
 	@GetMapping("/live-check")
-	public String liveCheck(@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
-		log.info("liveCheck:: correlationId:: " + correlationId);
+    public String liveCheck(@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
+        log.info("liveCheck:: correlationId:: " + correlationId);
 		Integer port = Integer.parseInt(environment.getProperty("server.port"));
 		return String.format("Api Gateway Client 01 Server:: %s", port);
 	}
@@ -45,5 +48,11 @@ public class LiveApi {
 	@GetMapping("/configuration")
 	public ProjectConfigDto configuration() throws Exception {
 		return new ProjectConfigDto(projectConfig);
+	}
+	
+	@GetMapping("/gateway-client-02/live-check")
+	public String gatewayClient02LiveCheck(@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
+		log.info("gatewayClient02LiveCheck:: correlationId:: " + correlationId);
+		return this.apiGatewayClient02FeignClient.liveCheck(correlationId);
 	}
 }
