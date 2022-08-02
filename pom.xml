@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>core.mircoservices.gateway.client01</groupId>
 	<artifactId>gateway-client01-test-server</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>gateway-client01-test-server</name>
 	<description>Api Gateway Client 01 Test Server</description>
 	<properties>
@@ -32,6 +32,10 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-bootstrap</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
 		<dependency>
@@ -39,6 +43,7 @@
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
 		</dependency>
 		<!-- tracing begin -->
+		<!--
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-sleuth</artifactId>
@@ -47,6 +52,7 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-sleuth-zipkin</artifactId>
 		</dependency>
+		-->
 		<!-- 
 		<dependency>
 			<groupId>org.springframework.amqp</groupId>
@@ -69,6 +75,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 	<dependencyManagement>

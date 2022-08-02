@@ -1,7 +1,11 @@
 package core.mircoservices.gateway.client01.api;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,43 +30,34 @@ public class LiveApi {
 	@Autowired
 	private ProjectConfig projectConfig;
 	
-	@Autowired
-	private ApiGatewayClient02FeignClient apiGatewayClient02FeignClient;
-	
-	@GetMapping("/live-check")
-    public String liveCheck(
-    		@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
-        log.info("liveCheck:: correlationId:: " + correlationId);
-		Integer port = Integer.parseInt(environment.getProperty("server.port"));
-		return String.format("Api Gateway Client 01 Server:: %s", port);
+	@GetMapping(value = {"/", "/live-check"})
+	public Map<String, Object> liveCheck(@RequestParam(required = false) List<String> envs) {
+		log.info("liveCheck:: envs:: " + envs);
+		if (envs == null) {
+			envs = new ArrayList<>();
+		}
+		envs.addAll(Arrays.asList("spring.application.name", "server.port"));
+		Map<String, Object> ret = this.getEnvironmentConfig(new HashSet<>(envs));
+		ret.put("projectConfig", new ProjectConfigDto(projectConfig));
+
+		return ret;
 	}
 
-	@GetMapping("/env-check")
-	public Map<String, String> testParam(@RequestParam("envs") List<String> envs) {
-		Map<String, String> ret = envs.stream()
+	public Map<String, Object> getEnvironmentConfig(Set<String> envs) {
+		Map<String, Object> ret = envs.stream()
 				.collect(Collectors.toMap(
 						k -> k, 
 						v -> environment.getProperty(v)));
 		return ret;
 	}
 	
-	@GetMapping("/configuration")
-	public ProjectConfigDto configuration() throws Exception {
-		Integer port = Integer.parseInt(environment.getProperty("server.port"));
-		var config = new ProjectConfigDto(projectConfig);
-		config.setPort(port);
-		return config;
-	}
-	
-	@GetMapping("/gateway-client-02/live-check")
-	public String gatewayClient02LiveCheck(
-			@RequestHeader(required = false, name="my-app-correlation-id") String correlationId)  {
+	@Autowired
+	private ApiGatewayClient02FeignClient apiGatewayClient02FeignClient;
+
+	@GetMapping("/client-02/live-check")
+	public Map<String, Object> gatewayClient02LiveCheck(
+			@RequestHeader(required = false, name = "my-app-correlation-id") String correlationId) {
 		log.info("gatewayClient02LiveCheck:: correlationId:: " + correlationId);
 		return this.apiGatewayClient02FeignClient.liveCheck(correlationId);
-	}
-
-	@GetMapping("/gateway-client-02/configuration")
-	public ProjectConfigDto gatewayClient02Configuration()  {
-		return this.apiGatewayClient02FeignClient.getProjectConfig();
 	}
 }
